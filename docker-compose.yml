@@ -52,6 +52,27 @@ services:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURIY_ADMIN_PASSWORD=admin123
     restart: unless-stopped
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki/loki-config.yml:/etc/loki/loki-config.yml
+      - loki_data:/loki
+    command: -config.file=/etc/loki/loki-config.yml
+    restart: unless-stopped
+    
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    volumes:
+      - ./promtail/promtail-config.yml:/etc/promtail/promtail-config.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/promtail-config.yml
+    restart: unless-stopped
     
   notes-app:
     image: trainwithshubham/notes-app:latest
@@ -62,3 +83,4 @@ services:
 volumes:
   prometheus_data:
   grafana_data:
+  loki_data:
